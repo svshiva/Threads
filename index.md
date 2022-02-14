@@ -1,37 +1,154 @@
-## Welcome to GitHub Pages
+## Welcome to Knowledge Base
+## You will learn Threads in java
 
-You can use the [editor on GitHub](https://github.com/svshiva/threads/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+### Threads
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Threads are sometimes called lightweight processes. Both processes and threads provide an execution environment, but creating a new thread requires fewer resources than creating a new process.
 
-### Markdown
+Threads exist within a process — every process has at least one. Threads share the process's resources, including memory and open files. This makes for efficient, but potentially problematic, communication.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Multithreaded execution is an essential feature of the Java platform. Every application has at least one thread — or several, if you count "system" threads that do things like memory management and signal handling. But from the application programmer's point of view, you start with just one thread, called the main thread. This thread has the ability to create additional threads, as we'll demonstrate in the next section.
 
-```markdown
-Syntax highlighted code block
+### __Using Runnable Interface__
 
-# Header 1
-## Header 2
-### Header 3
+```
+class Example implements Runnable {
 
-- Bulleted
-- List
+    @Override
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            System.out.println("Hello from example");
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
-1. Numbered
-2. List
+    }
 
-**Bold** and _Italic_ and `Code` text
+}
 
-[Link](url) and ![Image](src)
+public class HelloRunnable implements Runnable {
+
+    public static void main(String[] args) {
+        Thread x = new Thread(new HelloRunnable());
+        Thread y = new Thread(new Example());
+        x.start();
+        y.start();
+
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            char x = '\u2800';
+            System.out.println("Hello from run" + x);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+}
+
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+### __Using Thread Class__
 
-### Jekyll Themes
+```
+class A extends Thread {
+    String name;
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/svshiva/threads/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+    public A(String nameString) {
+        this.name = nameString;
+    }
 
-### Support or Contact
+    @Override
+    public void run(){
+        for (int i = 0; i < 10; i++) {
+            System.out.println(name);
+            try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+}
+
+public class HelloThread {
+    public static void main(String[] args) {
+        A a = new A("Shivam");
+        A b = new A("Aditi");
+        a.start();
+        b.start();
+
+    }
+}
+```
+
+### Simple Thread Example
+
+```
+public class SimpleThreads {
+
+    static void threadMessage(String message) {
+        String thread_name = Thread.currentThread().getName();
+        System.out.format("%s: %s,%n", thread_name, message);
+    }
+    
+    private static class MessageLoop implements Runnable{
+        @Override
+        public void run() {
+            String importantInfo[] = {"shivam","varnika","abhishek","aditi"};
+            try{
+                for (int i = 0; i < importantInfo.length; i++) {
+                    Thread.sleep(2000);
+                    threadMessage(importantInfo[i]);
+                }
+            }catch(InterruptedException e){
+                threadMessage("I wasn't done yet!!!");
+            }
+            
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException{
+        long patience = 1000*60*60; // default time
+        if(args.length>0){
+            try{
+                patience = 1000* Long.parseLong(args[0]);
+            }catch(NumberFormatException e){
+                System.err.println("Argument must be an integer !");
+                System.exit(1);
+            }
+        }
+
+        threadMessage("Starting message loop thread");
+        long startTime = System.currentTimeMillis();
+        Thread t = new Thread( new MessageLoop());
+        t.start();
+        threadMessage("Waiting for message loop thread to finish ");
+        while(t.isAlive()){
+            threadMessage("Still waiting");
+            t.join(1000);
+            if(((System.currentTimeMillis()-startTime)>patience) && t.isAlive()){
+                threadMessage("Tired of waiting");
+                t.interrupt();
+                // Shouldn't be long now
+                // -- wait indefinitely
+                t.join();
+            }
+        }
+
+        threadMessage("Finally!");
+    }
+}
+```
+
+
+#### Follow me on [Github](https://github.com/svshiva)
